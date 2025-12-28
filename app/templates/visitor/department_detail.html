@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Departamentos{% endblock %}
+
+{% block content %}
+<h3>Departamentos disponibles</h3>
+
+<div class="row">
+  {% for d in departments %}
+    <div class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ d.title }}</h5>
+          <p class="card-text">{{ d.address }}</p>
+          <p><strong>$ {{ d.price }}</strong></p>
+          <a href="#" class="btn btn-primary btn-sm">Ver detalle</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
