@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from typing import List, Optional
 from ..domain.entities import Department
 from ..repositories.interfaces import DepartmentRepository
@@ -12,3 +13,5 @@ class DepartmentService:
 
     def get_detail(self, department_id: str) -> Optional[Department]:
         return self.repo.get_by_id(department_id)
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)

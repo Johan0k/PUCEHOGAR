@@ -1,51 +1,60 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
+*.pyo
+*.pyd
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# Virtual Environment
+# =========================
+# Virtual environments
+# =========================
 venv/
+.venv/
 env/
 ENV/
-env.bak/
-venv.bak/
 
-# Flask
-instance/
-.webassets-cache
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Environment variables
+# =========================
+# Environment / secrets
+# =========================
 .env
-.env.local
-app/config_local.py.example
+app/config_local.py
 
-# OS
+# =========================
+# Flask
+# =========================
+instance/
+.webassets-cache/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# OS / Editor
+# =========================
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
+# =========================
+# IDEs
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# Test / coverage
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+# Build / temp
+# =========================
+build/
+dist/
+*.egg-info/

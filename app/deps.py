@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from typing import Dict, Any
 from .repositories.supabase.client import SupabaseClient
 from .repositories.supabase.department_repo import SupabaseDepartmentRepository
@@ -11,3 +12,5 @@ def build_container(config) -> Dict[str, Any]:
     return {
         "department_service": department_service,
     }
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)

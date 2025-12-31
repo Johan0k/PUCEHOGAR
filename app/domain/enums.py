@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from enum import Enum
 
 class DepartmentStatus(str, Enum):
@@ -8,3 +9,5 @@ class DepartmentStatus(str, Enum):
 class DepartmentType(str, Enum):
     RENT = "RENT"
     SALE = "SALE"
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)

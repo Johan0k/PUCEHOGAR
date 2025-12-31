@@ -9,6 +9,7 @@ from .routes.admin_routes import admin_bp
 
 def create_app():
     app = Flask(__name__)
+<<<<<<< HEAD
     cfg = get_config()
     app.secret_key = cfg.SECRET_KEY
 
@@ -17,6 +18,13 @@ def create_app():
 
     app.extensions["container"] = build_container(cfg)
 
+=======
+
+    # Clave simple por ahora (luego va a config.py)
+    app.secret_key = "dev-secret-key"
+
+    # Registro de blueprints
+>>>>>>> parent of 5d29c1f (Project Updated)
     app.register_blueprint(visitor_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(tenant_bp, url_prefix="/tenant")

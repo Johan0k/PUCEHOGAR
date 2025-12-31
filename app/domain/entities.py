@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from dataclasses import dataclass
 from .enums import DepartmentStatus, DepartmentType
 
@@ -11,3 +12,5 @@ class Department:
     type: DepartmentType
     status: DepartmentStatus
     description: str | None
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)

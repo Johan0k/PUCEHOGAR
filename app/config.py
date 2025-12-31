@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 class Config:
     SECRET_KEY = "dev-secret-key"
@@ -17,3 +18,5 @@ def get_config():
         return LocalConfig
     except ImportError:
         return Config
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)

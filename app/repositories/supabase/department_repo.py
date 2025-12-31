@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from typing import List, Optional
 from ..interfaces import DepartmentRepository
 from ...domain.entities import Department
@@ -41,3 +42,5 @@ class SupabaseDepartmentRepository(DepartmentRepository):
             status=DepartmentStatus(row["status"]),
             description=row.get("description"),
         )
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)
