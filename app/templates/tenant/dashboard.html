@@ -1,6 +1,100 @@
 {% extends "base.html" %}
-{% block title %}Inquilino{% endblock %}
+{% block title %}Panel del Inquilino - PUCEHOGAR{% endblock %}
+
 {% block content %}
-<h3>Panel del Inquilino</h3>
-<p class="text-muted">Aquí irán pagos y reportes.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><i class="bi bi-speedometer2"></i> Mi Panel</h2>
+  <div>
+    <a href="{{ url_for('tenant.new_payment') }}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nuevo Pago
+    </a>
+    <a href="{{ url_for('tenant.new_report') }}" class="btn btn-outline-primary">
+      <i class="bi bi-exclamation-triangle"></i> Nuevo Reporte
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Pagos -->
+  <div class="col-md-6">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-credit-card"></i> Mis Pagos</h5>
+      </div>
+      <div class="card-body">
+        {% if payments %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Mes</th>
+                  <th>Monto</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in payments %}
+                  <tr>
+                    <td>{{ payment.month }}</td>
+                    <td>${{ "%.2f"|format(payment.amount) }}</td>
+                    <td>
+                      <span class="badge bg-{{ 'warning' if payment.status.value == 'pending' else 'success' if payment.status.value == 'approved' else 'danger' }}">
+                        {{ payment.status.value|title }}
+                      </span>
+                    </td>
+                    <td>
+                      {% if not payment.receipt_url %}
+                        <a href="{{ url_for('tenant.upload_receipt', payment_id=payment.id) }}" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-upload"></i> Subir comprobante
+                        </a>
+                      {% else %}
+                        <a href="{{ payment.receipt_url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                          <i class="bi bi-eye"></i> Ver comprobante
+                        </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted text-center">No tienes pagos registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Reportes -->
+  <div class="col-md-6">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Mis Reportes</h5>
+      </div>
+      <div class="card-body">
+        {% if reports %}
+          <div class="list-group">
+            {% for report in reports %}
+              <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">{{ report.title }}</h6>
+                  <span class="badge bg-{{ 'primary' if report.status.value == 'open' else 'info' if report.status.value == 'in_progress' else 'success' if report.status.value == 'resolved' else 'secondary' }}">
+                    {{ report.status.value|title }}
+                  </span>
+                </div>
+                <p class="mb-1 text-muted">{{ report.description[:100] }}{% if report.description|length > 100 %}...{% endif %}</p>
+                <small class="text-muted">
+                  <i class="bi bi-calendar"></i> {{ report.created_at.strftime('%d/%m/%Y') if report.created_at else 'N/A' }}
+                </small>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted text-center">No tienes reportes registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
