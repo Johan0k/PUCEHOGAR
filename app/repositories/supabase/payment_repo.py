@@ -17,6 +17,15 @@ class SupabasePaymentRepository:
     
     def _row_to_entity(self, row: dict) -> Payment:
         """Convierte una fila de BD a entidad Payment"""
+        def _parse_dt(val):
+            if not val:
+                return None
+            if isinstance(val, datetime):
+                return val
+            try:
+                return datetime.fromisoformat(val.replace("Z", "+00:00"))
+            except Exception:
+                return None
         return Payment(
             id=str(row["id"]),
             tenant_id=str(row["tenant_id"]),
@@ -26,8 +35,8 @@ class SupabasePaymentRepository:
             month=row["month"],
             receipt_url=row.get("receipt_url"),
             notes=row.get("notes"),
-            created_at=row.get("created_at"),
-            updated_at=row.get("updated_at"),
+            created_at=_parse_dt(row.get("created_at")),
+            updated_at=_parse_dt(row.get("updated_at")),
             reviewed_by=row.get("reviewed_by")
         )
     

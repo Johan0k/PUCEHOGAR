@@ -41,7 +41,8 @@ instance/
 # Environment variables
 .env
 .env.local
-app/config_local.py.example
+app/config_local.py
+# NOTA: app/config_local.py.example SÍ debe estar en el repo (es un template)
 
 # OS
 .DS_Store

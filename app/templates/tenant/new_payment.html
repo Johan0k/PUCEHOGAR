@@ -9,7 +9,7 @@
         <h5 class="mb-0"><i class="bi bi-credit-card"></i> Registrar Nuevo Pago</h5>
       </div>
       <div class="card-body">
-        <form method="POST" action="{{ url_for('tenant.new_payment') }}">
+        <form method="POST" action="{{ url_for('tenant.new_payment') }}" enctype="multipart/form-data">
           <div class="mb-3">
             <label for="amount" class="form-label">Monto *</label>
             <input 
@@ -43,6 +43,19 @@
               name="notes" 
               rows="3"
             ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="receipt" class="form-label">Comprobante de pago *</label>
+            <input
+              type="file"
+              class="form-control"
+              id="receipt"
+              name="receipt"
+              accept="image/*,.pdf"
+              required
+            >
+            <small class="form-text text-muted">Obligatorio. Máx 10MB.</small>
           </div>
 
           <div class="d-grid gap-2">

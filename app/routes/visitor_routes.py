@@ -14,19 +14,70 @@ def get_services():
 
 @visitor_bp.route("/")
 def home():
-    """Página principal: catálogo de departamentos disponibles"""
+    """Página principal: catálogo de departamentos disponibles con filtros"""
     deps = get_services()
     department_service = deps.get('department_service')
-    
+
+    filters = {}
+    # Características
+    if request.args.get("has_terrace") == "1":
+        filters["has_terrace"] = True
+    if request.args.get("has_balcony") == "1":
+        filters["has_balcony"] = True
+    if request.args.get("sea_view") == "1":
+        filters["sea_view"] = True
+    if request.args.get("parking") == "1":
+        filters["parking"] = True
+    if request.args.get("furnished") == "1":
+        filters["furnished"] = True
+    # Rangos
+    def _parse_float(val):
+        try:
+            return float(val)
+        except Exception:
+            return None
+    def _parse_int(val):
+        try:
+            return int(val)
+        except Exception:
+            return None
+    min_price = _parse_float(request.args.get("min_price"))
+    max_price = _parse_float(request.args.get("max_price"))
+    min_rooms = _parse_int(request.args.get("min_rooms"))
+    max_rooms = _parse_int(request.args.get("max_rooms"))
+    if min_price is not None:
+        filters["min_price"] = min_price
+    if max_price is not None:
+        filters["max_price"] = max_price
+    if min_rooms is not None:
+        filters["min_rooms"] = min_rooms
+    if max_rooms is not None:
+        filters["max_rooms"] = max_rooms
+
     if department_service:
-        departments = department_service.get_all_departments(available_only=True)
+        departments = department_service.get_all_departments(
+            available_only=True,
+            filters=filters if filters else None
+        )
     else:
-        # Fallback si no hay servicios configurados
         departments = []
-    
+
+    active_filters = {
+        "has_terrace": filters.get("has_terrace", False),
+        "has_balcony": filters.get("has_balcony", False),
+        "sea_view": filters.get("sea_view", False),
+        "parking": filters.get("parking", False),
+        "furnished": filters.get("furnished", False),
+        "min_price": request.args.get("min_price", "") or "",
+        "max_price": request.args.get("max_price", "") or "",
+        "min_rooms": request.args.get("min_rooms", "") or "",
+        "max_rooms": request.args.get("max_rooms", "") or "",
+    }
+
     return render_template(
         "visitor/departments.html",
-        departments=departments
+        departments=departments,
+        active_filters=active_filters
     )
 
 

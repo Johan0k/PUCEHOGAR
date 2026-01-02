@@ -24,21 +24,24 @@ def dashboard():
     """Panel del inquilino"""
     user_id = get_current_user_id()
     deps = get_services()
-    
+
+    auth_service = deps.get('auth_service')
+    department_service = deps.get('department_service')
     payment_service = deps.get('payment_service')
     report_service = deps.get('report_service')
-    
-    payments = []
-    reports = []
-    
-    if payment_service:
-        payments = payment_service.get_payments_by_tenant(user_id)
-    
-    if report_service:
-        reports = report_service.get_reports_by_tenant(user_id)
-    
+
+    user = auth_service.get_user_by_id(user_id) if auth_service else None
+    department = None
+    if user and user.department_id and department_service:
+        department = department_service.get_department_by_id(user.department_id)
+
+    payments = payment_service.get_payments_by_tenant(user_id) if payment_service else []
+    reports = report_service.get_reports_by_tenant(user_id) if report_service else []
+
     return render_template(
         "tenant/dashboard.html",
+        user=user,
+        department=department,
         payments=payments,
         reports=reports
     )
@@ -55,32 +58,49 @@ def new_payment():
         amount = request.form.get("amount")
         month = request.form.get("month")
         notes = request.form.get("notes", "")
-        
-        # Obtener department_id del usuario
+
         auth_service = deps.get('auth_service')
-        if auth_service:
-            user = auth_service.get_user_by_id(user_id)
-            if not user or not user.department_id:
-                flash("No tienes un departamento asignado", "error")
-                return redirect(url_for("tenant.dashboard"))
-            
-            department_id = user.department_id
-            payment_service = deps.get('payment_service')
-            
-            try:
-                payment = payment_service.create_payment(
-                    tenant_id=user_id,
-                    department_id=department_id,
-                    amount=float(amount),
-                    month=month,
-                    notes=notes
-                )
-                flash("Pago registrado correctamente. Sube el comprobante para completar.", "success")
-                return redirect(url_for("tenant.upload_receipt", payment_id=payment.id))
-            except ValueError as e:
-                flash(str(e), "error")
-            except Exception as e:
-                flash(f"Error al crear el pago: {str(e)}", "error")
+        payment_service = deps.get('payment_service')
+
+        # Debe tener departamento asignado para este flujo
+        user = auth_service.get_user_by_id(user_id) if auth_service else None
+        if not user or not user.department_id:
+            flash("No tienes un departamento asignado", "error")
+            return redirect(url_for("tenant.dashboard"))
+
+        # Validar comprobante obligatorio
+        if 'receipt' not in request.files:
+            flash("Debes subir un comprobante de pago", "error")
+            return render_template("tenant/new_payment.html")
+        file = request.files['receipt']
+        if file.filename == '':
+            flash("Debes seleccionar un archivo de comprobante", "error")
+            return render_template("tenant/new_payment.html")
+
+        try:
+            file_content = file.read()
+            if len(file_content) == 0:
+                flash("El archivo está vacío", "error")
+                return render_template("tenant/new_payment.html")
+            if len(file_content) > 10 * 1024 * 1024:
+                flash("El archivo es demasiado grande. Máximo 10MB", "error")
+                return render_template("tenant/new_payment.html")
+
+            payment = payment_service.create_payment_with_receipt(
+                tenant_id=user_id,
+                department_id=user.department_id,
+                amount=float(amount),
+                month=month,
+                file_content=file_content,
+                file_name=file.filename,
+                notes=notes if notes else None
+            )
+            flash("Pago registrado correctamente. Está pendiente de revisión.", "success")
+            return redirect(url_for("tenant.dashboard"))
+        except ValueError as e:
+            flash(str(e), "error")
+        except Exception as e:
+            flash(f"Error al crear el pago: {str(e)}", "error")
     
     # GET: mostrar formulario
     return render_template("tenant/new_payment.html")
@@ -151,8 +171,17 @@ def new_report():
         return redirect(url_for("tenant.dashboard"))
     
     user = auth_service.get_user_by_id(user_id)
-    if not user or not user.department_id:
-        flash("No tienes un departamento asignado", "error")
+    payment_service = deps.get('payment_service')
+
+    department_id = user.department_id if user else None
+    if not department_id and payment_service:
+        payments = payment_service.get_payments_by_tenant(user_id)
+        approved = [p for p in payments if p.status.value == 'approved']
+        if approved:
+            department_id = approved[0].department_id
+
+    if not department_id:
+        flash("Debes tener un departamento asignado o un pago aprobado para crear reportes", "error")
         return redirect(url_for("tenant.dashboard"))
     
     if request.method == "POST":
@@ -163,7 +192,7 @@ def new_report():
         try:
             report = report_service.create_report(
                 tenant_id=user_id,
-                department_id=user.department_id,
+                department_id=department_id,
                 title=title,
                 description=description
             )

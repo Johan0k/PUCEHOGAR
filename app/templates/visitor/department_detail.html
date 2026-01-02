@@ -63,6 +63,19 @@
           </div>
         {% endif %}
       </div>
+
+      {% if department.has_terrace or department.has_balcony or department.sea_view or department.parking or department.furnished %}
+        <div class="mt-4">
+          <h4>Características Especiales</h4>
+          <div class="d-flex flex-wrap gap-2">
+            {% if department.has_terrace %}<span class="badge bg-info fs-6 p-2"><i class="bi bi-house-door"></i> Con Terraza</span>{% endif %}
+            {% if department.has_balcony %}<span class="badge bg-info fs-6 p-2"><i class="bi bi-door-open"></i> Con Balcón</span>{% endif %}
+            {% if department.sea_view %}<span class="badge bg-primary fs-6 p-2"><i class="bi bi-water"></i> Vista al Mar</span>{% endif %}
+            {% if department.parking %}<span class="badge bg-success fs-6 p-2"><i class="bi bi-car-front"></i> Estacionamiento</span>{% endif %}
+            {% if department.furnished %}<span class="badge bg-warning text-dark fs-6 p-2"><i class="bi bi-lamp"></i> Amueblado</span>{% endif %}
+          </div>
+        </div>
+      {% endif %}
     </div>
     
     <div class="col-md-4">

@@ -70,6 +70,32 @@ def payments_list():
     return render_template("admin/payments.html", payments=payments)
 
 
+@admin_bp.route("/payment/<payment_id>")
+@require_auth
+@require_role(UserRole.ADMIN)
+def payment_detail(payment_id: str):
+    """Vista detallada de un pago"""
+    deps = get_services()
+    payment_service = deps.get('payment_service')
+    auth_service = deps.get('auth_service')
+    department_service = deps.get('department_service')
+
+    payment = payment_service.get_payment_by_id(payment_id) if payment_service else None
+    if not payment:
+        flash("Pago no encontrado", "error")
+        return redirect(url_for("admin.payments_list"))
+
+    tenant = auth_service.get_user_by_id(payment.tenant_id) if auth_service else None
+    department = department_service.get_department_by_id(payment.department_id) if department_service else None
+
+    return render_template(
+        "admin/payment_detail.html",
+        payment=payment,
+        tenant=tenant,
+        department=department
+    )
+
+
 @admin_bp.route("/payment/<payment_id>/approve", methods=["POST"])
 @require_auth
 @require_role(UserRole.ADMIN)
@@ -78,17 +104,34 @@ def approve_payment(payment_id: str):
     user_id = get_current_user_id()
     deps = get_services()
     payment_service = deps.get('payment_service')
+    auth_service = deps.get('auth_service')
+    department_service = deps.get('department_service')
     
     try:
-        payment = payment_service.approve_payment(payment_id, user_id)
-        if payment:
+        payment = payment_service.get_payment_by_id(payment_id)
+        if not payment:
+            flash("Pago no encontrado", "error")
+            return redirect(url_for("admin.payments_list"))
+        if not payment.receipt_url:
+            flash("No se puede aprobar un pago sin comprobante", "error")
+            return redirect(url_for("admin.payment_detail", payment_id=payment_id))
+
+        approved = payment_service.approve_payment(payment_id, user_id)
+        if approved:
+            # Asignar departamento al inquilino si no lo tiene
+            if auth_service and department_service:
+                tenant = auth_service.get_user_by_id(approved.tenant_id)
+                if tenant and not tenant.department_id:
+                    tenant.department_id = approved.department_id
+                    auth_service.user_repo.update(tenant)
+                    department_service.mark_as_occupied(approved.department_id)
             flash("Pago aprobado correctamente", "success")
         else:
             flash("Error al aprobar el pago", "error")
     except Exception as e:
         flash(f"Error: {str(e)}", "error")
     
-    return redirect(url_for("admin.payments_list"))
+    return redirect(url_for("admin.payment_detail", payment_id=payment_id))
 
 
 @admin_bp.route("/payment/<payment_id>/reject", methods=["POST"])

@@ -30,6 +30,12 @@ class Department:
     bathrooms: Optional[int] = None
     area: Optional[float] = None
     image_url: Optional[str] = None
+    # Características especiales
+    has_terrace: bool = False
+    has_balcony: bool = False
+    sea_view: bool = False
+    parking: bool = False
+    furnished: bool = False
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

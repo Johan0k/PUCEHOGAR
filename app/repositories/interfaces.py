@@ -36,8 +36,12 @@ class DepartmentRepository(Protocol):
         """Obtiene un departamento por ID"""
         ...
     
-    def get_all(self, status: Optional[DepartmentStatus] = None) -> List[Department]:
-        """Obtiene todos los departamentos, opcionalmente filtrados por estado"""
+    def get_all(
+        self,
+        status: Optional[DepartmentStatus] = None,
+        filters: Optional[dict] = None
+    ) -> List[Department]:
+        """Obtiene todos los departamentos, con filtros opcionales (características, rangos)"""
         ...
     
     def create(self, department: Department) -> Department:

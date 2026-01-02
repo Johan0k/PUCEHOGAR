@@ -19,7 +19,8 @@ class DepartmentService:
     def get_all_departments(
         self,
         status: Optional[DepartmentStatus] = None,
-        available_only: bool = False
+        available_only: bool = False,
+        filters: Optional[dict] = None
     ) -> List[Department]:
         """
         Obtiene todos los departamentos.
@@ -27,10 +28,11 @@ class DepartmentService:
         Args:
             status: Filtrar por estado específico
             available_only: Si True, solo retorna departamentos disponibles
+            filters: Filtros opcionales (características, precio, rooms)
         """
         if available_only:
-            return self.department_repo.get_all(DepartmentStatus.AVAILABLE)
-        return self.department_repo.get_all(status)
+            return self.department_repo.get_all(DepartmentStatus.AVAILABLE, filters)
+        return self.department_repo.get_all(status, filters)
     
     def get_department_by_id(self, department_id: str) -> Optional[Department]:
         """Obtiene un departamento por ID"""

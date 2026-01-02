@@ -45,42 +45,9 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% if payment.status.value == 'pending' %}
-                    <form method="POST" action="{{ url_for('admin.approve_payment', payment_id=payment.id) }}" class="d-inline">
-                      <button type="submit" class="btn btn-sm btn-success">
-                        <i class="bi bi-check-circle"></i> Aprobar
-                      </button>
-                    </form>
-                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ payment.id }}">
-                      <i class="bi bi-x-circle"></i> Rechazar
-                    </button>
-                    
-                    <!-- Modal para rechazar -->
-                    <div class="modal fade" id="rejectModal{{ payment.id }}" tabindex="-1">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Rechazar Pago</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                          </div>
-                          <form method="POST" action="{{ url_for('admin.reject_payment', payment_id=payment.id) }}">
-                            <div class="modal-body">
-                              <div class="mb-3">
-                                <label for="notes{{ payment.id }}" class="form-label">Motivo del rechazo (opcional)</label>
-                                <textarea class="form-control" id="notes{{ payment.id }}" name="notes" rows="3"></textarea>
-                              </div>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-danger">Rechazar</button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  {% else %}
-                    <span class="text-muted">-</span>
-                  {% endif %}
+                  <a href="{{ url_for('admin.payment_detail', payment_id=payment.id) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-eye"></i> Ver Detalle
+                  </a>
                 </td>
               </tr>
             {% endfor %}

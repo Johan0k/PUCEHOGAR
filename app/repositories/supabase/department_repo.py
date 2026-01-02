@@ -26,8 +26,13 @@ class SupabaseDepartmentRepository:
             description=row.get("description"),
             rooms=row.get("rooms"),
             bathrooms=row.get("bathrooms"),
-            area=row.get("area"),
+            area=float(row["area"]) if row.get("area") else None,
             image_url=row.get("image_url"),
+            has_terrace=row.get("has_terrace", False) or False,
+            has_balcony=row.get("has_balcony", False) or False,
+            sea_view=row.get("sea_view", False) or False,
+            parking=row.get("parking", False) or False,
+            furnished=row.get("furnished", False) or False,
             created_at=row.get("created_at"),
             updated_at=row.get("updated_at")
         )
@@ -42,12 +47,38 @@ class SupabaseDepartmentRepository:
         except Exception:
             return None
     
-    def get_all(self, status: Optional[DepartmentStatus] = None) -> List[Department]:
-        """Obtiene todos los departamentos, opcionalmente filtrados por estado"""
+    def get_all(
+        self,
+        status: Optional[DepartmentStatus] = None,
+        filters: Optional[dict] = None
+    ) -> List[Department]:
+        """Obtiene todos los departamentos con filtros opcionales"""
         try:
             query = self.client.table(self.table).select("*")
+
             if status:
                 query = query.eq("status", status.value)
+
+            if filters:
+                if filters.get("has_terrace") is True:
+                    query = query.eq("has_terrace", True)
+                if filters.get("has_balcony") is True:
+                    query = query.eq("has_balcony", True)
+                if filters.get("sea_view") is True:
+                    query = query.eq("sea_view", True)
+                if filters.get("parking") is True:
+                    query = query.eq("parking", True)
+                if filters.get("furnished") is True:
+                    query = query.eq("furnished", True)
+                if filters.get("min_price") is not None:
+                    query = query.gte("price", filters["min_price"])
+                if filters.get("max_price") is not None:
+                    query = query.lte("price", filters["max_price"])
+                if filters.get("min_rooms") is not None:
+                    query = query.gte("rooms", filters["min_rooms"])
+                if filters.get("max_rooms") is not None:
+                    query = query.lte("rooms", filters["max_rooms"])
+
             result = query.order("created_at", desc=True).execute()
             return [self._row_to_entity(row) for row in result.data]
         except Exception:
@@ -64,7 +95,12 @@ class SupabaseDepartmentRepository:
             "rooms": department.rooms,
             "bathrooms": department.bathrooms,
             "area": department.area,
-            "image_url": department.image_url
+            "image_url": department.image_url,
+            "has_terrace": department.has_terrace,
+            "has_balcony": department.has_balcony,
+            "sea_view": department.sea_view,
+            "parking": department.parking,
+            "furnished": department.furnished
         }
         result = self.client.table(self.table).insert(data).execute()
         return self._row_to_entity(result.data[0])
@@ -81,6 +117,11 @@ class SupabaseDepartmentRepository:
             "bathrooms": department.bathrooms,
             "area": department.area,
             "image_url": department.image_url,
+            "has_terrace": department.has_terrace,
+            "has_balcony": department.has_balcony,
+            "sea_view": department.sea_view,
+            "parking": department.parking,
+            "furnished": department.furnished,
             "updated_at": datetime.utcnow().isoformat()
         }
         result = self.client.table(self.table).update(data).eq("id", department.id).execute()
