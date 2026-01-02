@@ -1,25 +1,30 @@
 from flask import Flask
+from .config import get_config
+from .deps import build_container
 
-from .config import Config
-from .deps import build_dependencies
 from .routes.visitor_routes import visitor_bp
 from .routes.auth_routes import auth_bp
 from .routes.tenant_routes import tenant_bp
 from .routes.admin_routes import admin_bp
 
-
 def create_app():
     app = Flask(__name__)
-    
-    # Cargar configuración
-    app.config['SECRET_KEY'] = Config.SECRET_KEY
-    app.config['DEBUG'] = Config.DEBUG
-    
-    # Construir dependencias y hacerlas disponibles en el contexto de la app
-    deps = build_dependencies()
-    app.config['deps'] = deps
-    
+<<<<<<< HEAD
+    cfg = get_config()
+    app.secret_key = cfg.SECRET_KEY
+
+    app.config["SUPABASE_URL"] = cfg.SUPABASE_URL
+    app.config["SUPABASE_KEY"] = cfg.SUPABASE_KEY
+
+    app.extensions["container"] = build_container(cfg)
+
+=======
+
+    # Clave simple por ahora (luego va a config.py)
+    app.secret_key = "dev-secret-key"
+
     # Registro de blueprints
+>>>>>>> parent of 5d29c1f (Project Updated)
     app.register_blueprint(visitor_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(tenant_bp, url_prefix="/tenant")

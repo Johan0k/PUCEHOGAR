@@ -1,25 +1,22 @@
-import os
-from typing import Optional
-
+<<<<<<< HEAD
 
 class Config:
-    """Configuración de la aplicación"""
+    SECRET_KEY = "dev-secret-key"
+
     
-    # Flask
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
-    
-    # Supabase
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "https://ajllimnmijoydpzrrpyn.supabase.co")
-    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbGxpbW5taWpveWRwenJycHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxMTkzOTMsImV4cCI6MjA4MjY5NTM5M30.QGsG81mcOaFA9QNrneLb-qaKBekmmTTn8tKa3kvQJyg")
-    # Service Role Key (bypasea RLS - solo para operaciones de servidor)
-    SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbGxpbW5taWpveWRwenJycHluIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzExOTM5MywiZXhwIjoyMDgyNjk1MzkzfQ.7vUxg0e6OwXhmeGSecsnI4CzjHm8tRSWA4RgobVSPuU")
-    
-    # Storage
-    STORAGE_BUCKET: str = os.getenv("STORAGE_BUCKET", "comprobantes")
-    
-    # Debug
-    DEBUG: bool = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+    SUPABASE_URL = "https://ukujhsrxjppmmzhgdfnz.supabase.co"
+    SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrdWpoc3J4anBwbW16aGdkZm56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxMzUxMTAsImV4cCI6MjA4MjcxMTExMH0.l2XnQOX8F01PG4EE9XSXBYq7MGFBwxvm2FKPW64DxhY"
 
 
-
-
+def get_config():
+    """
+    Intenta cargar config_local.py si existe.
+    Si no existe, usa Config por defecto.
+    """
+    try:
+        from .config import LocalConfig
+        return LocalConfig
+    except ImportError:
+        return Config
+=======
+>>>>>>> parent of 5d29c1f (Project Updated)
